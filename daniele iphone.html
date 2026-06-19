@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
+<title>Daniele — Workshop</title>
+
+<!-- PWA / Add to Home Screen support -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Daniele"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#FAFAF8"/>
+<link rel="apple-touch-icon" href="icon-180.png"/>
+<link rel="icon" type="image/png" sizes="180x180" href="icon-180.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#FAFAF8;
+  --surface:#FFFFFF;
+  --border:#EBEBEB;
+  --border-soft:#F2F2F0;
+  --text:#111110;
+  --text-2:#666662;
+  --text-3:#AEADA8;
+  --gold:#B8960C;
+  --gold-light:#F5EEC8;
+  --gold-bg:#FDFBF0;
+  --green:#1A7A52;
+  --green-bg:#EAF5EE;
+  --amber:#8A5200;
+  --amber-bg:#FEF3DF;
+  --red:#8A1F1F;
+  --red-bg:#FDEAEA;
+  --blue:#1A4F8A;
+  --blue-bg:#EAF0FB;
+  --purple:#3C2E8A;
+  --purple-bg:#EEEDFB;
+  --nav-h:72px;
+  --topbar-h:100px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;overflow-x:hidden}
+
+/* ── TOP BAR ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--surface);border-bottom:0.5px solid var(--border);padding:52px 20px 14px}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:'Playfair Display',serif;font-size:19px;font-weight:500;letter-spacing:0.04em;color:var(--text)}
+.brand-sub{font-size:10px;color:var(--gold);letter-spacing:0.14em;text-transform:uppercase;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.emp-tag{font-size:11px;color:var(--text-2);background:var(--bg);border:0.5px solid var(--border);padding:5px 10px;border-radius:20px;display:flex;align-items:center;gap:6px}
+.online-dot{width:6px;height:6px;border-radius:50%;background:#1A7A52;flex-shrink:0}
+.add-btn{width:34px;height:34px;border-radius:50%;background:var(--text);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0}
+
+/* ── SCROLL AREA ── */
+.scroll-area{margin-top:var(--topbar-h);margin-bottom:var(--nav-h);padding:16px;overflow-y:auto;min-height:calc(100vh - var(--topbar-h) - var(--nav-h))}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surface);border-top:0.5px solid var(--border);display:flex;align-items:flex-start;padding-top:10px;z-index:50}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0;color:var(--text-3)}
+.nav-tab.active{color:var(--text)}
+.nav-tab svg{width:22px;height:22px;stroke-width:1.6}
+.nav-label{font-size:10px;font-weight:500;letter-spacing:0.02em}
+.nav-pip{width:4px;height:4px;border-radius:50%;background:var(--text);margin-top:2px;opacity:0}
+.nav-tab.active .nav-pip{opacity:1}
+.nav-badge{position:absolute;top:-3px;right:-5px;background:#1A7A52;color:#fff;font-size:9px;font-weight:600;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center}
+.nav-icon-wrap{position:relative}
+
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── METRICS ROW ── */
+.metrics-scroll{display:flex;gap:10px;overflow-x:auto;margin:-4px -16px;padding:4px 16px;scrollbar-width:none}
+.metrics-scroll::-webkit-scrollbar{display:none}
+.metric-card{flex-shrink:0;width:140px;background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:14px}
+.metric-card.gold{background:var(--gold-bg);border-color:var(--gold-light)}
+.metric-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+.metric-value{font-size:26px;font-weight:600;line-height:1;color:var(--text)}
+.metric-value.gold-text{color:var(--gold)}
+.metric-sub{font-size:10px;color:var(--text-3);margin-top:4px}
+
+/* ── SECTION HEADER ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px}
+.section-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-2)}
+.section-link{font-size:12px;color:var(--gold);font-weight:500}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:10px}
+.card-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid var(--border-soft)}
+.card-row:last-child{border-bottom:none}
+.card-row-left{flex:1;min-width:0}
+.card-row-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-row-sub{font-size:11px;color:var(--text-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.b-new{background:#F2F1EC;color:#555}
+.b-prog{background:var(--amber-bg);color:var(--amber)}
+.b-parts{background:var(--red-bg);color:var(--red)}
+.b-ready{background:var(--green-bg);color:var(--green)}
+.b-done{background:var(--blue-bg);color:var(--blue)}
+.b-ret{background:var(--purple-bg);color:var(--purple)}
+.b-urg{background:var(--red-bg);color:var(--red)}
+.b-gold{background:var(--gold-light);color:var(--gold)}
+
+/* ── JOB CARD ── */
+.job-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:15px 16px;margin-bottom:10px}
+.job-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.job-docket{font-size:10px;color:var(--text-3);font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
+.job-name{font-size:14px;font-weight:500;margin-top:2px}
+.job-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.job-detail{font-size:12px;color:var(--text-2);margin-bottom:10px}
+.job-footer{display:flex;align-items:center;justify-content:space-between}
+.job-price{font-size:16px;font-weight:600}
+.job-balance{font-size:11px;color:var(--text-2);margin-top:1px}
+
+/* ── AVATAR ── */
+.avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.av-p{background:var(--purple-bg);color:var(--purple)}
+.av-t{background:var(--green-bg);color:var(--green)}
+.av-c{background:#FAECE7;color:#993C1D}
+.av-b{background:var(--blue-bg);color:var(--blue)}
+
+/* ── CUSTOMER CARD ── */
+.cust-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:15px 16px;margin-bottom:10px;display:flex;align-items:center;gap:13px}
+.cust-info{flex:1;min-width:0}
+.cust-name{font-size:14px;font-weight:500}
+.cust-detail{font-size:11px;color:var(--text-2);margin-top:2px}
+.cust-stats{text-align:right;flex-shrink:0}
+.cust-spend{font-size:15px;font-weight:600}
+.cust-jobs{font-size:11px;color:var(--text-2)}
+
+/* ── SEARCH BAR ── */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-input{width:100%;padding:11px 14px 11px 38px;border-radius:12px;border:0.5px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'Inter',sans-serif}
+.search-input:focus{outline:none;border-color:#ccc}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3)}
+
+/* ── FILTER PILLS ── */
+.filter-scroll{display:flex;gap:7px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none;padding-bottom:2px}
+.filter-scroll::-webkit-scrollbar{display:none}
+.filter-pill{flex-shrink:0;padding:6px 13px;border-radius:20px;border:0.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;color:var(--text-2);white-space:nowrap}
+.filter-pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* ── SMS BUTTON ── */
+.sms-btn{padding:8px 14px;border-radius:10px;background:var(--green-bg);border:0.5px solid #9FE1CB;color:var(--green);font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+
+/* ── WORKFLOW STAGES ── */
+.stage-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.stage-btn{padding:13px;border-radius:12px;border:0.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;color:var(--text-2);text-align:left;display:flex;align-items:center;gap:8px}
+.stage-btn.done{background:var(--green-bg);border-color:#9FE1CB;color:var(--green)}
+.stage-num{width:22px;height:22px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.stage-btn.done .stage-num{background:#fff}
+
+/* ── AUDIT ── */
+.audit-item{padding:13px 16px;border-bottom:0.5px solid var(--border-soft);display:flex;gap:11px;align-items:flex-start}
+.audit-item:last-child{border-bottom:none}
+.audit-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:4px;flex-shrink:0}
+.audit-text{font-size:12px;font-weight:500}
+.audit-sub{font-size:11px;color:var(--text-2);margin-top:2px}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.sheet{background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:20px}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.sheet-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{font-size:11px;color:var(--text-2);display:block;margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border-radius:12px;border:0.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:'Inter',sans-serif}
+.field textarea{height:90px;resize:none}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sheet-footer{display:flex;flex-direction:column;gap:8px;margin-top:20px;padding-top:16px;border-top:0.5px solid var(--border)}
+.btn-main{width:100%;padding:15px;border-radius:14px;background:var(--text);color:#fff;border:none;font-size:15px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-sec{width:100%;padding:13px;border-radius:14px;background:var(--bg);color:var(--text-2);border:0.5px solid var(--border);font-size:14px;cursor:pointer;font-family:'Inter',sans-serif}
+
+/* ── DASHBOARD URGENT CARD ── */
+.urg-card{background:var(--red-bg);border:0.5px solid #f5c5c5;border-radius:16px;overflow:hidden;margin-bottom:10px}
+.urg-item{padding:13px 16px;border-bottom:0.5px solid #f5c5c5;display:flex;align-items:center;justify-content:space-between}
+.urg-item:last-child{border-bottom:none}
+.urg-label{font-size:13px;font-weight:500;color:var(--red)}
+.urg-sub{font-size:11px;color:var(--red);opacity:0.7;margin-top:2px}
+
+/* ── WEEK CARD ── */
+.week-card{background:var(--gold-bg);border:0.5px solid var(--gold-light);border-radius:16px;overflow:hidden;margin-bottom:10px}
+.week-item{padding:13px 16px;border-bottom:0.5px solid var(--gold-light);display:flex;align-items:center;justify-content:space-between}
+.week-item:last-child{border-bottom:none}
+
+/* ── STAT ROWS ── */
+.stat-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:10px}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid var(--border-soft)}
+.stat-row:last-child{border-bottom:none}
+.stat-label{font-size:13px;color:var(--text-2)}
+.stat-val{font-size:13px;font-weight:600}
+
+/* ── VALUATION ── */
+.val-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
+.val-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.val-num{font-size:10px;color:var(--text-3);font-weight:500;letter-spacing:0.06em;text-transform:uppercase}
+.val-name{font-size:14px;font-weight:500;margin-top:3px}
+.val-amount{font-size:20px;font-weight:700;color:var(--gold)}
+.val-detail{font-size:12px;color:var(--text-2);margin-bottom:12px}
+.val-actions{display:flex;gap:8px}
+.val-btn{flex:1;padding:9px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg);color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;text-align:center}
+
+/* ── SMS LOG ── */
+.sms-log-item{padding:14px 16px;border-bottom:0.5px solid var(--border-soft)}
+.sms-log-item:last-child{border-bottom:none}
+.sms-log-name{font-size:13px;font-weight:500}
+.sms-log-msg{font-size:12px;color:var(--text-2);margin:4px 0;line-height:1.5}
+.sms-log-meta{font-size:11px;color:var(--text-3)}
+.sms-delivered{color:var(--green);font-size:11px;font-weight:500}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <div class="brand">Daniele</div>
+      <div class="brand-sub">Workshop</div>
+    </div>
+    <div class="topbar-right">
+      <div class="emp-tag"><div class="online-dot"></div>Maria R.</div>
+      <button class="add-btn" onclick="openSheet('job')">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll-area">
+
+  <!-- DASHBOARD -->
+  <div id="panel-dashboard" class="panel active">
+    <div class="metrics-scroll">
+      <div class="metric-card gold">
+        <div class="metric-label">Monthly revenue</div>
+        <div class="metric-value gold-text">$14,820</div>
+        <div class="metric-sub">June 2026</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">In progress</div>
+        <div class="metric-value">12</div>
+        <div class="metric-sub">active jobs</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Ready</div>
+        <div class="metric-value">5</div>
+        <div class="metric-sub">to collect</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Overdue</div>
+        <div class="metric-value" style="color:var(--red)">3</div>
+        <div class="metric-sub">past due</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">🔴 Urgent</div>
+      <div class="section-link" onclick="setTab('jobs')">See all</div>
+    </div>
+    <div class="urg-card">
+      <div class="urg-item">
+        <div><div class="urg-label">#D1048 · Sarah Mitchell</div><div class="urg-sub">Ring resize — due 20 Jun</div></div>
+        <span class="badge b-urg">Urgent</span>
+      </div>
+      <div class="urg-item">
+        <div><div class="urg-label">#D1046 · Karen Papadopoulos</div><div class="urg-sub">Custom gold chain — due 18 Jun</div></div>
+        <span class="badge b-urg">Urgent</span>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">📅 Due this week</div>
+      <div class="section-link" onclick="setTab('jobs')">See all</div>
+    </div>
+    <div class="week-card">
+      <div class="week-item">
+        <div><div style="font-size:13px;font-weight:500">#D1046 · Karen P.</div><div style="font-size:11px;color:var(--text-2);margin-top:2px">Custom gold chain</div></div>
+        <div style="text-align:right"><div style="font-size:12px;font-weight:500">18 Jun</div><span class="badge b-parts" style="margin-top:3px">Waiting on parts</span></div>
+      </div>
+      <div class="week-item">
+        <div><div style="font-size:13px;font-weight:500">#D1048 · Sarah M.</div><div style="font-size:11px;color:var(--text-2);margin-top:2px">Ring resize + polish</div></div>
+        <div style="text-align:right"><div style="font-size:12px;font-weight:500">20 Jun</div><span class="badge b-ready" style="margin-top:3px">Ready</span></div>
+      </div>
+      <div class="week-item">
+        <div><div style="font-size:13px;font-weight:500">#D1043 · Linda O.</div><div style="font-size:11px;color:var(--text-2);margin-top:2px">Earring re-post</div></div>
+        <div style="text-align:right"><div style="font-size:12px;font-weight:500">22 Jun</div><span class="badge b-new" style="margin-top:3px">New</span></div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">Revenue</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-row"><span class="stat-label">Today</span><span class="stat-val">$640</span></div>
+      <div class="stat-row"><span class="stat-label">This week</span><span class="stat-val">$3,210</span></div>
+      <div class="stat-row"><span class="stat-label">This month</span><span class="stat-val">$14,820</span></div>
+      <div class="stat-row"><span class="stat-label">This year</span><span class="stat-val">$84,230</span></div>
+    </div>
+
+    <div class="section-head"><div class="section-title">Job status</div></div>
+    <div class="stat-card">
+      <div class="stat-row"><span class="stat-label">New</span><span class="badge b-new">4</span></div>
+      <div class="stat-row"><span class="stat-label">In progress</span><span class="badge b-prog">8</span></div>
+      <div class="stat-row"><span class="stat-label">Waiting on parts</span><span class="badge b-parts">3</span></div>
+      <div class="stat-row"><span class="stat-label">Ready to collect</span><span class="badge b-ready">5</span></div>
+      <div class="stat-row"><span class="stat-label">Completed</span><span class="badge b-done">47</span></div>
+    </div>
+  </div>
+
+  <!-- ALL JOBS -->
+  <div id="panel-jobs" class="panel">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="search-input" id="job-search" placeholder="Search name, docket, phone..." oninput="filterJobs()"/>
+    </div>
+    <div class="filter-scroll" id="job-filters">
+      <div class="filter-pill active" onclick="setJobFilter(this,'')">All</div>
+      <div class="filter-pill" onclick="setJobFilter(this,'New')">New</div>
+      <div class="filter-pill" onclick="setJobFilter(this,'In Progress')">In Progress</div>
+      <div class="filter-pill" onclick="setJobFilter(this,'Waiting on Parts')">Waiting</div>
+      <div class="filter-pill" onclick="setJobFilter(this,'Ready to Collect')">Ready</div>
+      <div class="filter-pill" onclick="setJobFilter(this,'Completed')">Completed</div>
+      <div class="filter-pill" onclick="setJobFilter(this,'Urgent')">🔴 Urgent</div>
+    </div>
+    <div id="jobs-list"></div>
+  </div>
+
+  <!-- READY TO COLLECT -->
+  <div id="panel-ready" class="panel">
+    <div id="ready-list"></div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div id="panel-customers" class="panel">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="search-input" id="cust-search" placeholder="Search customers..." oninput="filterCustomers()"/>
+    </div>
+    <div class="filter-scroll">
+      <div class="filter-pill active" onclick="setCustFilter(this,'')">All</div>
+      <div class="filter-pill" onclick="setCustFilter(this,'Recurring')">Recurring</div>
+      <div class="filter-pill" onclick="setCustFilter(this,'New')">New</div>
+    </div>
+    <div id="cust-list"></div>
+  </div>
+
+  <!-- VALUATIONS -->
+  <div id="panel-valuations" class="panel">
+    <div id="val-list"></div>
+    <div style="margin-top:4px">
+      <button class="btn-main btn-gold" onclick="openSheet('val')">+ New valuation</button>
+    </div>
+  </div>
+
+  <!-- MESSAGING -->
+  <div id="panel-messaging" class="panel">
+    <button class="sms-btn" style="width:100%;justify-content:center;margin-bottom:14px;padding:13px" onclick="openSheet('sms')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      Send new SMS
+    </button>
+    <div class="card" id="sms-log-wrap"></div>
+  </div>
+
+  <!-- WORKFLOW -->
+  <div id="panel-workflow" class="panel">
+    <div style="font-size:12px;color:var(--text-2);margin-bottom:14px">Tap a stage to log a barcode scan. Physical scanners will do this automatically in production.</div>
+    <div class="stage-grid" id="stages"></div>
+    <div id="scan-result" style="font-size:12px;color:var(--green);font-weight:500;margin-bottom:14px;min-height:18px"></div>
+    <div class="section-title" style="margin-bottom:10px">Audit trail</div>
+    <div class="card" id="audit-list"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-tab active" id="tab-dashboard" onclick="setTab('dashboard')">
+    <div class="nav-icon-wrap">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </div>
+    <div class="nav-label">Home</div>
+    <div class="nav-pip"></div>
+  </div>
+  <div class="nav-tab" id="tab-jobs" onclick="setTab('jobs')">
+    <div class="nav-icon-wrap">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      <span class="nav-badge">12</span>
+    </div>
+    <div class="nav-label">Jobs</div>
+    <div class="nav-pip"></div>
+  </div>
+  <div class="nav-tab" id="tab-ready" onclick="setTab('ready')">
+    <div class="nav-icon-wrap">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-label">Ready</div>
+    <div class="nav-pip"></div>
+  </div>
+  <div class="nav-tab" id="tab-customers" onclick="setTab('customers')">
+    <div class="nav-icon-wrap">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <div class="nav-label">Customers</div>
+    <div class="nav-pip"></div>
+  </div>
+  <div class="nav-tab" id="tab-more" onclick="setTab('workflow')">
+    <div class="nav-icon-wrap">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    </div>
+    <div class="nav-label">More</div>
+    <div class="nav-pip"></div>
+  </div>
+</div>
+
+<!-- NEW JOB SHEET -->
+<div class="overlay" id="overlay-job">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">New docket</div>
+    <div class="field-row">
+      <div class="field"><label>Customer name</label><input type="text" placeholder="Full name"/></div>
+      <div class="field"><label>Phone</label><input type="tel" placeholder="04xx xxx xxx"/></div>
+    </div>
+    <div class="field"><label>Email</label><input type="email" placeholder="email@example.com"/></div>
+    <div class="field-row">
+      <div class="field"><label>Jewellery type</label><select><option>Ring</option><option>Necklace</option><option>Bracelet</option><option>Earrings</option><option>Watch</option><option>Other</option></select></div>
+      <div class="field"><label>Job type</label><select><option>Repair</option><option>Custom Make</option></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Quote ($)</label><input type="number" placeholder="0.00"/></div>
+      <div class="field"><label>Deposit ($)</label><input type="number" placeholder="0.00"/></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Priority</label><select><option>Normal</option><option>Urgent</option></select></div>
+      <div class="field"><label>Due date</label><input type="date"/></div>
+    </div>
+    <div class="field"><label>Assigned to</label><select><option>Maria Rossi</option><option>Tom Chen</option><option>Linda Park</option></select></div>
+    <div class="field"><label>Job description</label><textarea placeholder="Describe the job..."></textarea></div>
+    <div class="field"><label>Internal notes</label><textarea placeholder="Staff notes only..."></textarea></div>
+    <div class="sheet-footer">
+      <button class="btn-main" onclick="closeSheet('job')">💾 Save &amp; print packet</button>
+      <button class="btn-sec" onclick="closeSheet('job')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- VALUATION SHEET -->
+<div class="overlay" id="overlay-val">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">New valuation</div>
+    <div class="field-row">
+      <div class="field"><label>Customer</label><input type="text" placeholder="Full name"/></div>
+      <div class="field"><label>Date</label><input type="date"/></div>
+    </div>
+    <div class="field"><label>Item description</label><input type="text" placeholder="e.g. Diamond solitaire ring"/></div>
+    <div class="field-row">
+      <div class="field"><label>Metal type</label><input type="text" placeholder="18ct Yellow Gold"/></div>
+      <div class="field"><label>Weight (g)</label><input type="number" placeholder="0.0"/></div>
+    </div>
+    <div class="field"><label>Gemstone details</label><input type="text" placeholder="e.g. 0.5ct Round Diamond, VS1"/></div>
+    <div class="field-row">
+      <div class="field"><label>Valuation ($)</label><input type="number" placeholder="0.00"/></div>
+      <div class="field"><label>Valuer name</label><input type="text" placeholder="Valuer"/></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn-main btn-gold" onclick="closeSheet('val')">📄 Generate PDF certificate</button>
+      <button class="btn-sec" onclick="closeSheet('val')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SMS SHEET -->
+<div class="overlay" id="overlay-sms">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Send SMS</div>
+    <div class="field"><label>Customer</label>
+      <select id="sms-customer" onchange="updateSMSMsg()">
+        <option value="Sarah Mitchell|0412 345 678|Ring #D1048">Sarah Mitchell — 0412 345 678</option>
+        <option value="Karen Papadopoulos|0411 987 654|Necklace #D1046">Karen Papadopoulos — 0411 987 654</option>
+        <option value="James Wu|0432 555 100|Ring #D1045">James Wu — 0432 555 100</option>
+      </select>
+    </div>
+    <div class="field"><label>Message</label><textarea id="sms-msg">Hi Sarah, your Ring #D1048 is ready for collection. Please contact us or reply to arrange pickup. Thank you, Daniele Designer Jeweller.</textarea></div>
+    <div class="sheet-footer">
+      <button class="btn-main" style="background:var(--green)" onclick="closeSheet('sms')">📨 Send via MessageNet</button>
+      <button class="btn-sec" onclick="closeSheet('sms')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const jobs=[
+  {docket:'#D1048',name:'Sarah Mitchell',initials:'SM',av:'av-p',phone:'0412 345 678',jewel:'Ring',type:'Repair',desc:'Resize + polish',due:'20 Jun',quote:'$95',deposit:'$50',balance:'$45',status:'Ready to Collect',priority:'Urgent',emp:'Maria R.',recurring:true},
+  {docket:'#D1047',name:'Tom Nguyen',initials:'TN',av:'av-t',phone:'0423 111 222',jewel:'Watch',type:'Repair',desc:'Battery + full service',due:'25 Jun',quote:'$140',deposit:'$0',balance:'$140',status:'In Progress',priority:'Normal',emp:'Tom C.',recurring:false},
+  {docket:'#D1046',name:'Karen Papadopoulos',initials:'KP',av:'av-c',phone:'0411 987 654',jewel:'Necklace',type:'Custom Make',desc:'Custom gold chain 18ct',due:'18 Jun',quote:'$480',deposit:'$200',balance:'$280',status:'Waiting on Parts',priority:'Urgent',emp:'Linda P.',recurring:true},
+  {docket:'#D1045',name:'James Wu',initials:'JW',av:'av-b',phone:'0432 555 100',jewel:'Ring',type:'Custom Make',desc:'Engagement ring design',due:'30 Jun',quote:'$1,200',deposit:'$600',balance:'$600',status:'In Progress',priority:'Normal',emp:'Maria R.',recurring:false},
+  {docket:'#D1044',name:'Sarah Mitchell',initials:'SM',av:'av-p',phone:'0412 345 678',jewel:'Bracelet',type:'Repair',desc:'Clasp replacement',due:'15 Jun',quote:'$75',deposit:'$75',balance:'$0',status:'Ready to Collect',priority:'Normal',emp:'Tom C.',recurring:true},
+  {docket:'#D1043',name:'Linda Okafor',initials:'LO',av:'av-t',phone:'0401 222 333',jewel:'Earrings',type:'Repair',desc:'Re-post + new backing',due:'22 Jun',quote:'$60',deposit:'$0',balance:'$60',status:'New',priority:'Normal',emp:'Linda P.',recurring:false},
+];
+const customers=[
+  {name:'Sarah Mitchell',initials:'SM',av:'av-p',phone:'0412 345 678',email:'sarah@email.com',type:'Recurring',jobs:7,spend:'$1,840',last:'19 Jun 2026'},
+  {name:'Karen Papadopoulos',initials:'KP',av:'av-c',phone:'0411 987 654',email:'karen@email.com',type:'Recurring',jobs:5,spend:'$2,140',last:'18 Jun 2026'},
+  {name:'James Wu',initials:'JW',av:'av-b',phone:'0432 555 100',email:'james@email.com',type:'New',jobs:1,spend:'$1,200',last:'17 Jun 2026'},
+  {name:'Tom Nguyen',initials:'TN',av:'av-t',phone:'0423 111 222',email:'tom@email.com',type:'Recurring',jobs:3,spend:'$410',last:'16 Jun 2026'},
+  {name:'Linda Okafor',initials:'LO',av:'av-t',phone:'0401 222 333',email:'linda@email.com',type:'New',jobs:1,spend:'$60',last:'15 Jun 2026'},
+];
+const valuations=[
+  {num:'VAL-0021',name:'Sarah Mitchell',item:'Diamond solitaire ring',metal:'18ct Yellow Gold',gem:'0.5ct Round Diamond, VS1',weight:'3.2g',amount:'$4,800',date:'10 Jun 2026',valuer:'Maria Rossi'},
+  {num:'VAL-0020',name:'Karen Papadopoulos',item:'Diamond tennis bracelet',metal:'18ct White Gold',gem:'2.0ct Diamond total weight',weight:'8.1g',amount:'$12,500',date:'2 Jun 2026',valuer:'Maria Rossi'},
+];
+const smsLog=[
+  {name:'Sarah Mitchell',phone:'0412 345 678',msg:'Hi Sarah, your Ring #D1048 is ready for collection. Please contact us or reply to arrange pickup. Thank you, Daniele Designer Jeweller.',time:'Today 10:14am',emp:'Maria R.',status:'Delivered'},
+  {name:'Karen Papadopoulos',phone:'0411 987 654',msg:'Hi Karen, your job #D1046 is currently waiting on parts. We will update you as soon as it\'s ready. Thank you, Daniele Designer Jeweller.',time:'Yesterday 3:42pm',emp:'Tom C.',status:'Delivered'},
+];
+const stageList=['Intake','Repair Bench','Manufacturing','Stone Setting','Polishing','Quality Control','Photography','Ready for Collection'];
+let auditLog=[
+  {emp:'Maria R.',detail:'#D1048 moved to Ready for Collection',time:'Today 10:12am'},
+  {emp:'Tom C.',detail:'#D1047 moved to Repair Bench',time:'Today 9:30am'},
+  {emp:'Linda P.',detail:'#D1046 moved to Waiting on Parts',time:'Yesterday 4:15pm'},
+];
+
+let jobFilter='', custFilter='';
+
+function sc(s){return s==='New'?'b-new':s==='In Progress'?'b-prog':s==='Waiting on Parts'?'b-parts':s==='Ready to Collect'?'b-ready':'b-done'}
+
+function renderJobs(data){
+  document.getElementById('jobs-list').innerHTML=data.length?data.map(j=>`
+    <div class="job-card">
+      <div class="job-card-top">
+        <div><div class="job-docket">${j.docket}</div><div class="job-name">${j.name}</div></div>
+        <button class="sms-btn" style="padding:7px 11px" onclick="openSMS('${j.name}','${j.phone}','${j.docket}','${j.jewel}')">SMS</button>
+      </div>
+      <div class="job-badges">
+        <span class="badge ${sc(j.status)}">${j.status}</span>
+        ${j.priority==='Urgent'?'<span class="badge b-urg">Urgent</span>':''}
+        ${j.recurring?'<span class="badge b-ret">Recurring</span>':''}
+        <span class="badge b-gold">${j.jewel}</span>
+      </div>
+      <div class="job-detail">${j.type} · ${j.desc} · ${j.emp} · Due ${j.due}</div>
+      <div class="job-footer">
+        <div><div class="job-price">${j.quote}</div><div class="job-balance">Balance: ${j.balance}</div></div>
+        <span style="font-size:11px;color:var(--text-3)">${j.phone}</span>
+      </div>
+    </div>`).join(''):'<div style="text-align:center;padding:40px;color:var(--text-3);font-size:13px">No jobs found</div>';
+}
+
+function filterJobs(){
+  const q=document.getElementById('job-search').value.toLowerCase();
+  renderJobs(jobs.filter(j=>{
+    const matchQ=!q||(j.name+j.docket+j.phone+j.desc).toLowerCase().includes(q);
+    const matchF=!jobFilter||(jobFilter==='Urgent'?j.priority==='Urgent':j.status===jobFilter);
+    return matchQ&&matchF;
+  }));
+}
+
+function setJobFilter(el,val){
+  document.querySelectorAll('#job-filters .filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  jobFilter=val;
+  filterJobs();
+}
+
+function renderReady(){
+  const readyJobs=jobs.filter(j=>j.status==='Ready to Collect');
+  document.getElementById('ready-list').innerHTML=readyJobs.map(j=>`
+    <div class="job-card">
+      <div class="job-card-top">
+        <div><div class="job-docket">${j.docket}</div><div class="job-name">${j.name}</div></div>
+        <span class="badge b-ready">Ready</span>
+      </div>
+      <div class="job-badges">
+        ${j.recurring?'<span class="badge b-ret">Recurring</span>':''}
+        <span class="badge b-gold">${j.jewel}</span>
+        ${j.priority==='Urgent'?'<span class="badge b-urg">Urgent</span>':''}
+      </div>
+      <div class="job-detail">${j.type} · ${j.desc} · Balance: ${j.balance}</div>
+      <button class="sms-btn" style="width:100%;justify-content:center;margin-top:4px" onclick="openSMS('${j.name}','${j.phone}','${j.docket}','${j.jewel}')">
+        📨 Notify ${j.name.split(' ')[0]} via SMS
+      </button>
+    </div>`).join('');
+}
+
+function renderCustomers(data){
+  document.getElementById('cust-list').innerHTML=data.map(c=>`
+    <div class="cust-card">
+      <div class="avatar av-${c.av.replace('av-','')||'t'}" style="width:42px;height:42px;font-size:13px">${c.initials}</div>
+      <div class="cust-info">
+        <div class="cust-name">${c.name} ${c.type==='Recurring'?'<span class="badge b-ret" style="font-size:9px">Recurring</span>':''}</div>
+        <div class="cust-detail">${c.phone} · ${c.email}</div>
+        <div class="cust-detail">Last job: ${c.last}</div>
+      </div>
+      <div class="cust-stats">
+        <div class="cust-spend">${c.spend}</div>
+        <div class="cust-jobs">${c.jobs} jobs</div>
+        <button class="sms-btn" style="margin-top:6px;padding:6px 10px;font-size:11px" onclick="openSMS('${c.name}','${c.phone}','','')">SMS</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterCustomers(){
+  const q=document.getElementById('cust-search').value.toLowerCase();
+  renderCustomers(customers.filter(c=>{
+    const matchQ=!q||(c.name+c.phone+c.email).toLowerCase().includes(q);
+    const matchF=!custFilter||c.type===custFilter;
+    return matchQ&&matchF;
+  }));
+}
+
+function setCustFilter(el,val){
+  el.closest('.filter-scroll').querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  custFilter=val;
+  filterCustomers();
+}
+
+function renderValuations(){
+  document.getElementById('val-list').innerHTML=valuations.map(v=>`
+    <div class="val-card">
+      <div class="val-top">
+        <div><div class="val-num">${v.num} · ${v.date}</div><div class="val-name">${v.name}</div></div>
+        <div class="val-amount">${v.amount}</div>
+      </div>
+      <div class="val-detail">${v.item} · ${v.metal} · ${v.gem} · ${v.weight}</div>
+      <div class="val-actions">
+        <button class="val-btn">📄 PDF</button>
+        <button class="val-btn">✉️ Email</button>
+        <button class="val-btn">💬 SMS</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderSMS(){
+  document.getElementById('sms-log-wrap').innerHTML=smsLog.map(s=>`
+    <div class="sms-log-item">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="sms-log-name">${s.name}</div>
+        <div class="sms-delivered">✓ ${s.status}</div>
+      </div>
+      <div class="sms-log-msg">${s.msg}</div>
+      <div class="sms-log-meta">${s.time} · ${s.emp} · ${s.phone}</div>
+    </div>`).join('');
+}
+
+function renderWorkflow(){
+  document.getElementById('stages').innerHTML=stageList.map((s,i)=>`
+    <div class="stage-btn" id="stage-${i}" onclick="scanStage(${i},'${s}')">
+      <div class="stage-num">${i+1}</div>${s}
+    </div>`).join('');
+  document.getElementById('audit-list').innerHTML=auditLog.slice(0,6).map(a=>`
+    <div class="audit-item">
+      <div class="audit-dot"></div>
+      <div><div class="audit-text">${a.detail}</div><div class="audit-sub">${a.emp} · ${a.time}</div></div>
+    </div>`).join('');
+}
+
+function scanStage(i,name){
+  document.querySelectorAll('.stage-btn').forEach(s=>s.classList.remove('done'));
+  document.getElementById('stage-'+i).classList.add('done');
+  const t=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  document.getElementById('scan-result').textContent='✓ Scanned: "'+name+'" · Maria R. · '+t;
+  auditLog.unshift({emp:'Maria R.',detail:'Job scanned at stage: '+name,time:'Just now'});
+  renderWorkflow();
+}
+
+function setTab(id){
+  const tabs=['dashboard','jobs','ready','customers','workflow'];
+  tabs.forEach(t=>{
+    document.getElementById('panel-'+t)?.classList.remove('active');
+    document.getElementById('tab-'+t)?.classList.remove('active');
+  });
+  // handle more tabs
+  ['valuations','messaging'].forEach(t=>{
+    document.getElementById('panel-'+t)?.classList.remove('active');
+  });
+  document.getElementById('panel-'+id)?.classList.add('active');
+  const tabEl=document.getElementById('tab-'+id)||document.getElementById('tab-more');
+  tabEl?.classList.add('active');
+  if(id==='jobs')filterJobs();
+  if(id==='ready')renderReady();
+  if(id==='customers')renderCustomers(customers);
+  if(id==='valuations')renderValuations();
+  if(id==='messaging')renderSMS();
+  if(id==='workflow')renderWorkflow();
+}
+
+function openSheet(id){document.getElementById('overlay-'+id).classList.add('open')}
+function closeSheet(id){document.getElementById('overlay-'+id).classList.remove('open')}
+function openSMS(name,phone,docket,jewel){
+  const ta=document.getElementById('sms-msg');
+  ta.value=`Hi ${name}, your ${jewel||'jewellery'} ${docket?'order '+docket:''} is ready for collection. Please contact us or reply to arrange pickup. Thank you, Daniele Designer Jeweller.`.trim();
+  openSheet('sms');
+}
+function updateSMSMsg(){
+  const parts=document.getElementById('sms-customer').value.split('|');
+  document.getElementById('sms-msg').value=`Hi ${parts[0]}, your ${parts[2]} is ready for collection. Please contact us or reply to arrange pickup. Thank you, Daniele Designer Jeweller.`;
+}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open')}));
+
+filterJobs();
+</script>
+</body>
+</html>
